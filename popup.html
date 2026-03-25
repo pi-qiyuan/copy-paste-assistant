@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title data-i18n="popup_title"></title>
+  <link rel="stylesheet" href="css/popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1 data-i18n="popup_title"></h1>
+    <div id="milestoneBanner" class="milestone-banner" style="display: none;"></div>
+
+    <!-- Category Management -->
+    <div class="category-header">
+      <div class="category-row">
+        <select id="categorySelect" class="main-select">
+          <!-- Dynamically filled -->
+        </select>
+        <div class="category-actions">
+          <button id="editCatBtn" class="icon-btn" data-i18n-title="edit_category_title">✎</button>
+          <button id="deleteCatBtn" class="icon-btn danger" data-i18n-title="delete_category_title">🗑</button>
+          <button id="toggleSearchBtn" class="icon-btn" data-i18n-title="search_items_title">🔍</button>
+          <button id="showAddCatBtn" class="icon-btn primary" data-i18n-title="add_category_title">+</button>
+        </div>
+      </div>
+      
+      <!-- Add Category Form -->
+      <div id="addCatForm" class="add-cat-form" style="display: none;">
+        <input type="text" id="newCatNameInput" data-i18n-placeholder="category_name_placeholder">
+        <button id="confirmAddCatBtn" data-i18n="confirm_add_category"></button>
+      </div>
+    </div>
+
+    <!-- Toggle Add Item Button -->
+    <button id="toggleAddItemBtn" class="toggle-add-btn" data-i18n="new_item_btn"></button>
+
+    <!-- Search Bar -->
+    <div id="searchContainer" class="search-container" style="display: none;">
+      <input type="text" id="searchInput" data-i18n-placeholder="search_placeholder">
+      <span id="clearSearch" class="clear-search" style="display: none;">&times;</span>
+    </div>
+
+    <!-- Add Item Form -->
+    <div id="addItemForm" class="input-form">
+      <textarea id="itemContent" data-i18n-placeholder="item_content_placeholder"></textarea>
+      <div id="remarkContainer" class="remark-container" style="display: none;">
+        <input type="text" id="itemName" data-i18n-placeholder="item_name_placeholder">
+      </div>
+      <button id="toggleRemarkBtn" class="link-btn" data-i18n="add_remark_btn"></button>
+      <button id="addBtn" data-i18n="add_item_btn"></button>
+    </div>
+
+    <!-- Item List -->
+    <div id="itemList" class="item-list">
+      <!-- Dynamically filled -->
+    </div>
+
+    <!-- Backup Management -->
+    <div class="data-management">
+      <div class="settings-row">
+        <label class="checkbox-container">
+          <input type="checkbox" id="showFloatingBtnCheckbox">
+          <span data-i18n="setting_show_floating_button"></span>
+        </label>
+      </div>
+      <div class="backup-actions">
+        <button id="exportBtn" class="secondary-btn" data-i18n="export_btn"></button>
+        <button id="importBtn" class="secondary-btn" data-i18n="import_btn"></button>
+      </div>
+      <input type="file" id="fileInput" accept=".json" style="display: none;">
+    </div>
+
+    <div class="footer">
+      <a href="https://hugbear.ai/" target="_blank" data-i18n="more_tools"></a>
+      <span class="divider">|</span>
+      <a href="https://ko-fi.com/qiyuanyang" target="_blank" data-i18n="buy_coffee"></a>
+    </div>
+  </div>
+
+  <!-- Delete Group Modal -->
+  <div id="deleteGroupModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h3 data-i18n="delete_group_modal_title"></h3>
+      <div class="modal-actions-vertical">
+        <button id="btnDeleteGroupOnly" class="modal-btn secondary" data-i18n="delete_group_only"></button>
+        <button id="btnDeleteGroupAll" class="modal-btn danger" data-i18n="delete_group_and_items"></button>
+        <button id="btnClearGroupItems" class="modal-btn" data-i18n="clear_group_items"></button>
+        <button id="btnCancelDelete" class="modal-btn link" data-i18n="btn_cancel"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <script src="js/common/utils.js"></script>
+  <script src="js/core/storage-manager.js"></script>
+  <script src="js/core/data-service.js"></script>
+  <script src="js/core/backup-service.js"></script>
+  <script src="js/ui/popup-renderer.js"></script>
+  <script src="js/ui/popup.js"></script>
+</body>
+</html>
