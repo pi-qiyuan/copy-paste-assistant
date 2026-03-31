@@ -33,6 +33,11 @@ Whether you are filling out repetitive forms, responding to customer inquiries, 
 
 ---
 
+## Installation
+[Download on Chrome Web Store](https://chromewebstore.google.com/detail/copy-paste-assistant/lmhmeaaocicajifgnkpolnmkmpbjphbi)
+
+---
+
 ## 📖 Instructions
 
 1. **Add Snippets**: Click the extension icon to add your first piece of text. Choose a specific category or use the "Default" one.
