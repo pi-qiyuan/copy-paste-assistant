@@ -26,9 +26,7 @@ function updateContextMenus() {
   isUpdating = true;
 
   chrome.contextMenus.removeAll(() => {
-    if (chrome.runtime.lastError) {
-      console.error('Error removing menus:', chrome.runtime.lastError.message);
-    }
+    if (chrome.runtime.lastError) { }
 
     // 1. Create root menu
     chrome.contextMenus.create({

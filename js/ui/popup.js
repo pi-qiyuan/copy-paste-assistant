@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- DOM Elements ---
   const elements = {
     addBtn: document.getElementById('addBtn'),
+    cancelAddBtn: document.getElementById('cancelAddBtn'),
     itemNameInput: document.getElementById('itemName'),
     itemContentInput: document.getElementById('itemContent'),
     itemList: document.getElementById('itemList'),
@@ -10,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     deleteCatBtn: document.getElementById('deleteCatBtn'),
     showAddCatBtn: document.getElementById('showAddCatBtn'),
     addCatForm: document.getElementById('addCatForm'),
+    cancelAddCatBtn: document.getElementById('cancelAddCatBtn'),
     newCatNameInput: document.getElementById('newCatNameInput'),
     confirmAddCatBtn: document.getElementById('confirmAddCatBtn'),
     toggleSearchBtn: document.getElementById('toggleSearchBtn'),
@@ -42,7 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
     isSearchMode: false,
     isAddCatMode: false,
     isAddItemMode: true,
-    userPrefExpanded: true
+    userPrefExpanded: true,
+    hasManuallyClosedAddForm: false // Temporary session state
   };
 
   // --- Initialization ---
@@ -128,8 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Add Item Controls
     const isSpecialView = state.isSearchMode || state.isAddCatMode || state.currentCategoryId === 'recent';
-    toggleAddItemBtn.style.display = isSpecialView ? 'none' : 'block';
-    toggleAddItemBtn.classList.toggle('active', state.isAddItemMode);
+    
+    // Hide the toggle button if we are in add mode
+    const showToggleBtn = !isSpecialView && !state.isAddItemMode && !state.editingId;
+    toggleAddItemBtn.style.display = showToggleBtn ? 'block' : 'none';
     
     const shouldShowAddForm = (state.isAddItemMode && !isSpecialView) || state.editingId;
     addItemForm.style.display = shouldShowAddForm ? 'flex' : 'none';
@@ -163,7 +168,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // Auto-expand logic
       if (!state.isSearchMode && !state.isAddCatMode && state.currentCategoryId !== 'recent') {
         const categoryItemsCount = data.items.filter(i => (i.categoryId || StorageManager.DEFAULT_CAT_ID) === state.currentCategoryId).length;
-        state.isAddItemMode = categoryItemsCount === 0 ? true : state.userPrefExpanded;
+        
+        if (state.hasManuallyClosedAddForm) {
+          state.isAddItemMode = false;
+        } else {
+          state.isAddItemMode = categoryItemsCount === 0 ? true : state.userPrefExpanded;
+        }
       }
 
       updateUIState();
@@ -210,17 +220,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Category
     elements.showAddCatBtn.addEventListener('click', () => {
-      state.isAddCatMode = !state.isAddCatMode;
-      if (state.isAddCatMode) {
-        elements.toggleSearchBtn.classList.remove('active');
-        state.isSearchMode = false;
-        elements.newCatNameInput.focus();
-      }
+      state.isAddCatMode = true;
+      elements.toggleSearchBtn.classList.remove('active');
+      state.isSearchMode = false;
+      elements.newCatNameInput.focus();
+      updateUIState();
+    });
+
+    elements.cancelAddCatBtn.addEventListener('click', () => {
+      state.isAddCatMode = false;
+      elements.newCatNameInput.value = '';
       updateUIState();
     });
 
     elements.categorySelect.addEventListener('change', (e) => {
       state.currentCategoryId = e.target.value;
+      state.hasManuallyClosedAddForm = false; // Reset on category change
       StorageManager.setData({ lastCategoryId: state.currentCategoryId });
       if (!state.isSearchMode) refreshList();
     });
@@ -244,11 +259,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Item Actions
     elements.toggleAddItemBtn.addEventListener('click', () => {
-      state.isAddItemMode = !state.isAddItemMode;
-      state.userPrefExpanded = state.isAddItemMode;
-      StorageManager.setData({ isAddItemFormExpanded: state.userPrefExpanded });
-      if (state.isAddItemMode) elements.itemContentInput.focus();
+      state.isAddItemMode = true;
+      state.hasManuallyClosedAddForm = false; // User manually opened it
+      state.userPrefExpanded = true;
+      StorageManager.setData({ isAddItemFormExpanded: true });
+      elements.itemContentInput.focus();
       updateUIState();
+    });
+
+    elements.cancelAddBtn.addEventListener('click', () => {
+      StorageManager.getData((data) => {
+        const categoryItemsCount = data.items.filter(i => (i.categoryId || StorageManager.DEFAULT_CAT_ID) === state.currentCategoryId).length;
+        
+        state.isAddItemMode = false;
+        state.editingId = null;
+        
+        if (categoryItemsCount > 0) {
+          // If category has items, user is effectively saying "don't auto-expand for non-empty categories"
+          state.userPrefExpanded = false;
+          StorageManager.setData({ isAddItemFormExpanded: false });
+        } else {
+          // If category is empty, only hide for this session (as requested)
+          state.hasManuallyClosedAddForm = true;
+        }
+        
+        finishAdd(); 
+      });
     });
 
     elements.toggleRemarkBtn.addEventListener('click', () => {
@@ -373,6 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.addBtn.innerText = chrome.i18n.getMessage('add_item_btn');
         StorageManager.setData({ items }, () => {
           showToast(chrome.i18n.getMessage('status_added'));
+          state.isAddItemMode = false;
           finishAdd();
         });
       } else {
@@ -385,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
           StorageManager.incrementItemsCreated((newStats) => {
             showToast(chrome.i18n.getMessage('status_added'));
             checkMilestones({ ...data, stats: newStats });
+            state.isAddItemMode = false;
             finishAdd();
           });
         });
@@ -480,9 +518,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const text = BackupService.generateExportText(data);
       const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
+      const name = chrome.i18n.getMessage('extension_name');
       const a = document.createElement('a');
       a.href = url;
-      a.download = `backup_${new Date().toISOString().split('T')[0]}.txt`;
+      a.download = `${name}_${new Date().toISOString().split('T')[0]}.txt`;
       a.click();
       URL.revokeObjectURL(url);
     });

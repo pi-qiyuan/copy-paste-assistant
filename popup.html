@@ -26,8 +26,12 @@
       
       <!-- Add Category Form -->
       <div id="addCatForm" class="add-cat-form" style="display: none;">
+        <div class="add-cat-title" data-i18n="add_category_title"></div>
         <input type="text" id="newCatNameInput" data-i18n-placeholder="category_name_placeholder">
-        <button id="confirmAddCatBtn" data-i18n="confirm_add_category"></button>
+        <div class="form-actions">
+          <button id="confirmAddCatBtn" data-i18n="confirm_add_category"></button>
+          <button id="cancelAddCatBtn" data-i18n="btn_cancel"></button>
+        </div>
       </div>
     </div>
 
@@ -42,12 +46,16 @@
 
     <!-- Add Item Form -->
     <div id="addItemForm" class="input-form">
+      <div class="add-item-title" data-i18n="add_item_title"></div>
       <textarea id="itemContent" data-i18n-placeholder="item_content_placeholder"></textarea>
       <div id="remarkContainer" class="remark-container" style="display: none;">
         <input type="text" id="itemName" data-i18n-placeholder="item_name_placeholder">
       </div>
       <button id="toggleRemarkBtn" class="link-btn" data-i18n="add_remark_btn"></button>
-      <button id="addBtn" data-i18n="add_item_btn"></button>
+      <div class="form-actions">
+        <button id="addBtn" data-i18n="add_item_btn"></button>
+        <button id="cancelAddBtn" data-i18n="btn_cancel"></button>
+      </div>
     </div>
 
     <!-- Item List -->
@@ -67,7 +75,7 @@
         <button id="exportBtn" class="secondary-btn" data-i18n="export_btn"></button>
         <button id="importBtn" class="secondary-btn" data-i18n="import_btn"></button>
       </div>
-      <input type="file" id="fileInput" accept=".json" style="display: none;">
+      <input type="file" id="fileInput" accept=".txt" style="display: none;">
     </div>
 
     <div class="footer">

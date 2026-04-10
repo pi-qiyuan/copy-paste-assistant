@@ -70,9 +70,7 @@ function copyToClipboard(text, btn) {
     setTimeout(() => {
       btn.innerHTML = oldText;
     }, 1500);
-  }).catch(err => {
-    console.error('Clipboard copy failed:', err);
-  });
+  }).catch(err => { });
 }
 
 /**
@@ -122,7 +120,6 @@ async function insertToPage(text, btn) {
       alert(chrome.i18n.getMessage('alert_no_input_box'));
     }
   } catch (e) {
-    console.error('Insert failed:', e);
     alert(chrome.i18n.getMessage('alert_insert_failed'));
   }
 }
